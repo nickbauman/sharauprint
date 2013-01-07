@@ -40,7 +40,7 @@ You might find other files print well, too. YMMV.
 ### Acknowledgements
 
 I've shamelessly used John Wiegley's (johnw auf 
-newartisans.com) directory scanning python code to
+newartisans punkt com) directory scanning python code to
 search for and housekeep directory state for new
 files to print. It's seems pretty robust but once
 in a while a file will get deleted and won't print.
