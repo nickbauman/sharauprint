@@ -18,7 +18,7 @@ able to make PDF files you can drop on a share.
 ### Requirements
  
 For this you will need a Linux box. I used a Raspberry Pi.
-You will also need to install CUPS, Samba, Python, a 
+You will also need to install git, CUPS, Samba, Python, a 
 supported driver for your printer under Linux.
 
 ### Installation

@@ -42,6 +42,7 @@ out
 # Custom, project-specific files #
 ##################################
 bin
+airprint-generate
 
 # Other SCM files #
 ##################################

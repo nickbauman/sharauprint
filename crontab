@@ -1,4 +1,0 @@
-# Add the following crontab entry. 
-# Use whatever path you want to the script
-
-* * * * * /home/pi/checkprint.py
