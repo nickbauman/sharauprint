@@ -21,22 +21,28 @@ For this you will need a Linux box. I used a Raspberry Pi.
 You will also need to install git, CUPS, Samba, Python, a 
 supported driver for your printer under Linux.
 
-The install.py program will attempt to automate this.
+The install.py program will attempt to automate this. It
+is still a work in progress but it seems to work well for
+me. Let me know if you find any bugs.
 
 ### Installation
 
 Run sudo install.py with your printer turned on and 
-connected to the Linux server.
+connected to the Linux machine.
 
 Here is what the installer does:
 
 It configures Samba to create a share available to 
 anyone on the network.  
 
-Finally you may add the crontab entry to a user 
-who as read-write access to the share.
+It then creates crontab entry to a user 
+who as read-write access to the share. This
+runs the checkprint.py program once a minute looking
+for print jobs in the share.
 
-Now you may print by placing PDF files on the share.
+This is so you may print by placing PDF files on 
+the share.
+
 You might find other files print well, too. YMMV.
 
 You should also see your printers available as
