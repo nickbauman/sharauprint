@@ -21,15 +21,17 @@ For this you will need a Linux box. I used a Raspberry Pi.
 You will also need to install git, CUPS, Samba, Python, a 
 supported driver for your printer under Linux.
 
+The install.py program will attempt to automate this.
+
 ### Installation
 
-First, configure Samba to create a share available to 
+Run sudo install.py with your printer turned on and 
+connected to the Linux server.
+
+Here is what the installer does:
+
+It configures Samba to create a share available to 
 anyone on the network.  
-
-Hint: Use the samba.conf file as an example.
-
-Then get your printer working with the CUPS system
-you have installed. That isn't covered here. 
 
 Finally you may add the crontab entry to a user 
 who as read-write access to the share.
@@ -37,7 +39,17 @@ who as read-write access to the share.
 Now you may print by placing PDF files on the share.
 You might find other files print well, too. YMMV.
 
+You should also see your printers available as
+AirPrinters, too, so you can print from AirPrint
+capable devices such as your cell phone or Mac.
+
 ### Acknowledgements
+
+This software boldly uses Timothy J Fontaine 
+(tjfontaine 
+auf atxconsulting punkt com) fine airprint
+generate program to generate AirPrint servers
+automatically from CUPS printers as God intended.
 
 I've shamelessly used John Wiegley's (johnw auf 
 newartisans punkt com) directory scanning python code to
@@ -47,6 +59,6 @@ in a while a file will get deleted and won't print.
 I estimate this happens about 1% of the time (YMMV)
 but it hasn't happened in while.
 
-I've included his code here as a zip file but I
+I've included John's code here as a zip file but I
 added a ".remove" extension.
 
