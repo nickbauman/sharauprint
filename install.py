@@ -30,10 +30,13 @@ from shutil import move, copy
 from os import remove, path, mkdir, close, chdir, getcwd
 
 
-INST_PKG_LIST = ["git", "cups", "python-cups", "samba", "avahi-daemon"]
+INST_PKG_LIST = ['git', 'cups', 'python-cups', 'samba', 'avahi-daemon']
 SMB_SHARE_PATH = '/srv/sharauprint'
 SMB_CONF = '/etc/samba/smb.conf'
 SMB_CONF_TMPL = 'templates/smb.conf.tmpl'
+AVAHI_SVCS = '/etc/avahi/services/'
+AIRPRINT_GEN_SCRIPT = '/airprint-generate/airprint-generate.py'
+AIRPRINT_REPO = 'https://github.com/tjfontaine/airprint-generate'
 
 class InstallProgressSync(apt.progress.base.InstallProgress):
 
@@ -122,13 +125,16 @@ def aptget_deps():
 def create_avahi_srvs():
   if not path.exists("airprint-generate"):
     print "Fetching airprint-generate." 
-    call(["git", "clone", "https://github.com/tjfontaine/airprint-generate"])
+    call(["git", "clone", AVAHI_REPO])
   print "Generating airprint services."
   last_dir = getcwd()
-  chdir('/etc/avahi/services/')
-  call(["python", "".join([last_dir, "/airprint-generate/airprint-generate.py"])])
+  chdir(AVAHI_SVCS)
+  call(["python", "".join([last_dir, AIRPRINT_GEN_SCRIPT])])
+  chdir(last_dir)
+  call(["service", "avahi-daemon", "restart"])
 
 def create_print_share():
+  print "Configuring Samba"
   if path.isdir(SMB_SHARE_PATH):
     print "Apparently %s already exists. Ensuring world-writable." % SMB_SHARE_PATH
     call(["chmod", "777", SMB_SHARE_PATH])
