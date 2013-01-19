@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import apt_pkg, apt, re
+import apt_pkg, apt, re, mmap
 
 from subprocess import call
 from tempfile import mkstemp
@@ -8,17 +8,20 @@ from shutil import move, copy
 from os import remove, path, mkdir, close
 
 
-pkgList = ["git", "cups", "python-cups", "samba", "avahi-daemon"]
-smbShare = '/srv/sharauprint'
+INST_PKG_LIST = ["git", "cups", "python-cups", "samba", "avahi-daemon"]
+SMB_SHARE_PATH = '/srv/sharauprint'
+SMB_CONF = '/etc/samba/smb.conf'
+SMB_CONF_TMPL = 'templates/smb.conf.tmpl'
 
-class InstallProgress(apt.progress.InstallProgress):
+class InstallProgressSync(apt.progress.base.InstallProgress):
 
   def fork(self):
     pass # don't fork
   
 def found_in_file(fileName, pattern):
   with open(fileName) as f:
-    for line in f:
+    s = mmap.mmap(f.fileno(), 0, mmap.ACCESS_READ)
+    for line in s:
       if re.match(pattern):
         return True
   return False 
@@ -42,15 +45,15 @@ def token_inflate(file, pattern, subst, outfile, appendMode=False):
     move(absPath, outfile)
 
 def check_pkg_status(package):
-  versions = package.VersionList
+  versions = package.version_list
   version = versions[0]
   for other_version in versions:
-    if apt_pkg.VersionCompare(version.VerStr, other_version.VerStr)<0:
+    if apt_pkg.version_compare(version.ver_str, other_version.ver_str)<0:
       version = other_version
    
-  if package.CurrentVer:
-    current = package.CurrentVer
-    if apt_pkg.VersionCompare(current.VerStr, version.VerStr)<0:
+  if package.current_ver:
+    current = package.current_ver
+    if apt_pkg.version_compare(current.ver_str, version.ver_str)<0:
       return "upgradable"
     else:
       return "current"
@@ -78,19 +81,18 @@ def install_if_missing(cache=False, cacheManager=False, packageName=False):
   raise Exception("missing cache, cacheManager or packageName in call")
 
 def aptget_deps():
-  print "Installing %s packages via apt" % ", ".join(pkgList) 
+  print "Installing %s packages via apt" % ", ".join(INST_PKG_LIST) 
   apt_pkg.init_config()
   apt_pkg.init_system()
   cache = apt_pkg.Cache()
   cacheManager = apt_pkg.DepCache(cache)
   installerate = lambda pkgName: install_if_missing(cache, cacheManager, pkgName)
-  result = map(installerate, pkgList)
+  result = map(installerate, INST_PKG_LIST)
 
   if any(result):
     # install or update these packages
     fetchProgress = apt.progress.TextFetchProgress()
-    #installProgress = apt.progress.InstallProgress()
-    installProgress = InstallProgress()
+    installProgress = InstallProgressSync()
     cacheManager.commit(fetchProgress, installProgress)
   else:
     print "Packages already installed"
@@ -103,27 +105,21 @@ def create_avahi_srvs():
   call(["python", "airprint-generate/airprint-generate.py"])
 
 def create_print_share():
-  print "Creating SMB printer share in %s" % smbShare
-  try:
-    with open(smbShare) as f:
-      pass
-    mkdir(smbShare, mode=0777)  
-  except:
-    print "Directory %s already exists! Making world writable" % smbShare 
-    call(["chmod", "777", smbShare])
-  try:
-    with open('/etc/samba/smb.conf') as f:
+  if path.isdir(SMB_SHARE_PATH):
+    print "Apparently %s already exists. Ensuring world-writable." % SMB_SHARE_PATH
+    call(["chmod", "777", SMB_SHARE_PATH])
+  else: 
+    print "Creating SMB printer share in %s" % SMB_SHARE_PATH
+    mkdir(SMB_SHARE_PATH, 0777)
+    if path.isfile(SMB_CONF):
       print "Samba config found. Will add sharauprint if necessary." 
-    if not found_in_file('/etc/samba/smb.conf', '.*sharauprint.*'):
+    if not found_in_file(SMB_CONF, '.*sharauprint.*'):
       print "Backing up existing samba config."
-      copy('/etc/samba/smb.conf', '/etc/samba/smb.conf.sharauprint.bak')
-      token_inflate("templates/smb.conf.tmpl", '$SRV_PATH', smbShare, '/etc/samba/smb.conf', True)
+      copy(SMB_CONF, "".join([SMB_CONF,'.bak']))
+      token_inflate(SMB_CONF_TMPL, '$SRV_PATH', SMB_SHARE_PATH, SMB_CONF, True)
       call(["service", "smbd", "restart"])
     else:
       print "It appears as though you've already configured a sharauprint share. Skipping."
-  except:
-    print "This is truly a bug. Cannot find your samba installation"
-
 def main():
   """Main."""
   aptget_deps()

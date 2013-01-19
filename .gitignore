@@ -43,6 +43,7 @@ out
 ##################################
 bin
 airprint-generate
+AirPrint*
 
 # Other SCM files #
 ##################################
