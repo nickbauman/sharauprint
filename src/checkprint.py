@@ -5,6 +5,9 @@ from os.path import expanduser
 from dirscan import Entry, DirScanner, safeRemove, processOptions
 from subprocess import call
 
+#TODO replace duplicated constants into a single dependency
+SMB_SHARE_PATH = '/srv/sharauprint'
+
 class PrintEntry(Entry):
   def onEntryAdded(self):
     print self.path
@@ -14,7 +17,7 @@ class PrintEntry(Entry):
     call(["lpr", "-o", "fit-to-page", self.path])
     return Entry.onEntryAdded(self)
  
-d = DirScanner(directory        = '/srv/pdfprintq',
+d = DirScanner(directory        = SMB_SHARE_PATH,
                days             = 0.001,
                sudo             = True,
                depth            = 0,
