@@ -15,6 +15,9 @@ has to have a driver for a particular printer: you
 just need for Linux to support it and your OS to be
 able to make PDF files you can drop on a share.
 
+This also turns any CUPS printer on the machine into
+an AirPrint printer.
+
 ### Requirements
  
 For this you will need a Debian or Debian-derived Linux 
