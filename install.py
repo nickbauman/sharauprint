@@ -36,6 +36,7 @@ SMB_CONF_TMPL = 'templates/smb.conf.tmpl'
 AVAHI_SVCS = '/etc/avahi/services/'
 AIRPRINT_GEN_SCRIPT = '/airprint-generate/airprint-generate.py'
 AVAHI_REPO = 'https://github.com/tjfontaine/airprint-generate'
+DIRSCAN_REPO = 'https://github.com/jwiegley/dirscan'
 
 class InstallProgressSync(apt.progress.base.InstallProgress):
 
@@ -160,6 +161,12 @@ def create_print_share():
     else:
       print "It appears as though you've already configured a sharauprint share. Skipping."
 
+def install_dirscan():
+  if not path.exists("dirscan"):
+    print "Fetching dirscan." 
+    call(["git", "clone", DIRSCAN_REPO])
+    copy("dirscan/dirscan.py", "src/")
+  
 def create_crontab():
   from crontab import CronTab
   print "Setting up the crontab to check for PDF in '%s' to print" % SMB_SHARE_PATH
@@ -190,6 +197,7 @@ def main():
   pip_deps()
   create_avahi_srvs() 
   create_print_share()
+  install_dirscan()
   create_crontab()
    
 if __name__ == "__main__":
