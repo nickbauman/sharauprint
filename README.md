@@ -1,6 +1,6 @@
 # sharauprint
 
-### Print Automatically a file on a share
+### Share Automatically Prints to CUPS printer (plus AirPrint) 
 
 This project exists because my printer driver was no 
 longer supported by my OS (driver support was dropped
