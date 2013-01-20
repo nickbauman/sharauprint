@@ -56,14 +56,10 @@ auf atxconsulting punkt com) fine airprint
 generate program to generate AirPrint servers
 automatically from CUPS printers as god intended.
 
-I've shamelessly used John Wiegley's (johnw auf 
+This software leans heavily on John Wiegley's (johnw auf 
 newartisans punkt com) directory scanning python code to
 search for and housekeep directory state for new
 files to print. It's seems pretty robust but once
 in a while a file will get deleted and won't print.
 I estimate this happens about 1% of the time (YMMV)
 but it hasn't happened in while.
-
-I've included John's code here as a zip file but I
-added a ".remove" extension.
-
