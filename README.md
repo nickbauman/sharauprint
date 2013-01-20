@@ -17,9 +17,8 @@ able to make PDF files you can drop on a share.
 
 ### Requirements
  
-For this you will need a Linux box. I used a Raspberry Pi.
-You will also need to install git, CUPS, Samba, Python, a 
-supported driver for your printer under Linux.
+For this you will need a Debian or Debian-derived Linux 
+box. I used a Raspberry Pi.
 
 The install.py program will attempt to automate this. It
 is still a work in progress but it seems to work well for
@@ -55,7 +54,7 @@ This software boldly uses Timothy J Fontaine
 (tjfontaine 
 auf atxconsulting punkt com) fine airprint
 generate program to generate AirPrint servers
-automatically from CUPS printers as God intended.
+automatically from CUPS printers as god intended.
 
 I've shamelessly used John Wiegley's (johnw auf 
 newartisans punkt com) directory scanning python code to

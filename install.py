@@ -105,7 +105,7 @@ def install_if_missing(cache=False, cacheManager=False, packageName=False):
   raise Exception("missing cache, cacheManager or packageName in call")
 
 def aptget_deps():
-  print "Installing %s packages via apt" % ", ".join(INST_PKG_LIST) 
+  print "Installing required packages %s via apt" % ", ".join(INST_PKG_LIST) 
   apt_pkg.init_config()
   apt_pkg.init_system()
   cache = apt_pkg.Cache()
@@ -118,11 +118,19 @@ def aptget_deps():
     fetchProgress = apt.progress.text.TextProgress()
     installProgress = InstallProgressSync()
     cacheManager.commit(fetchProgress, installProgress)
-    print "Packages required to complete the installation have been installed. Please rerun the program."
-    sys.exit()
+    sys.exit("Packages required to complete the installation have been installed. Please rerun the program.")
   else:
-    print "Packages already installed. Carrying on with installation."
-  
+    print "Packages already installed."
+ 
+def pip_deps():
+  try:
+    from crontab import CronTab
+  except ImportError:
+    print "You are missing python-crontab. Getting it to continue install" 
+    call(["pip", "install", "python-crontab"])
+    sys.exit("python-crontab installed. Please rerun the script to continue.")
+  print "Python dependencies already installed." 
+
 def create_avahi_srvs():
   if not path.exists("airprint-generate"):
     print "Fetching airprint-generate." 
@@ -151,11 +159,38 @@ def create_print_share():
       call(["service", "smbd", "restart"])
     else:
       print "It appears as though you've already configured a sharauprint share. Skipping."
+
+def create_crontab():
+  from crontab import CronTab
+  print "Setting up the crontab to check for PDF in '%s' to print" % SMB_SHARE_PATH
+  usr = raw_input('Enter the user you wish to check the fileshare with under cron: ') 
+  tab = CronTab(user=usr)
+  cmd = "".join([getcwd(), '/src/checkprint.py'])
+  if(tab.find_command(cmd)):
+    print "You have a crontab for this already. Skipping."
+    return True
+  cron_job = tab.new(cmd, comment="Adding sharauprint script, checks once a minute.")
+  cron_job.month().on('*')
+  cron_job.dom().on('*')
+  cron_job.dow().on('*')
+  cron_job.hour().on('*')
+  cron_job.minute().on('*')
+  tab.write()
+  print "Wrote %s to user %s" % tab.render(), usr 
+
 def main():
   """Main."""
+  print "Installing sharauprint." 
+  print "Please have your printer turned on and attached." 
+  print "This script must be run from where you wish to have the program live."
+  proceed = raw_input("Press 'y' to proceed, otherwise exiting: ")
+  if('y' != proceed):
+    sys.exit("Exiting")
   aptget_deps()
+  pip_deps()
   create_avahi_srvs() 
   create_print_share()
+  create_crontab()
    
 if __name__ == "__main__":
   main()
