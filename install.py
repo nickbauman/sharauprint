@@ -22,26 +22,25 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-import apt_pkg, apt, re, mmap
+import apt_pkg, apt, re, mmap, sys
 
 from subprocess import call
 from tempfile import mkstemp
 from shutil import move, copy
 from os import remove, path, mkdir, close, chdir, getcwd
 
-
-INST_PKG_LIST = ['git', 'cups', 'python-cups', 'samba', 'avahi-daemon']
+INST_PKG_LIST = ['python-pip', 'git', 'cups', 'python-cups', 'samba', 'avahi-daemon']
 SMB_SHARE_PATH = '/srv/sharauprint'
 SMB_CONF = '/etc/samba/smb.conf'
 SMB_CONF_TMPL = 'templates/smb.conf.tmpl'
 AVAHI_SVCS = '/etc/avahi/services/'
 AIRPRINT_GEN_SCRIPT = '/airprint-generate/airprint-generate.py'
-AIRPRINT_REPO = 'https://github.com/tjfontaine/airprint-generate'
+AVAHI_REPO = 'https://github.com/tjfontaine/airprint-generate'
 
 class InstallProgressSync(apt.progress.base.InstallProgress):
 
   def fork(self):
-    pass # don't fork
+    return False # don't fork
   
 def found_in_file(fileName, pattern):
   with open(fileName) as f:
@@ -116,11 +115,13 @@ def aptget_deps():
 
   if any(result):
     # install or update these packages
-    fetchProgress = apt.progress.TextFetchProgress()
+    fetchProgress = apt.progress.text.TextProgress()
     installProgress = InstallProgressSync()
     cacheManager.commit(fetchProgress, installProgress)
+    print "Packages required to complete the installation have been installed. Please rerun the program."
+    sys.exit()
   else:
-    print "Packages already installed"
+    print "Packages already installed. Carrying on with installation."
   
 def create_avahi_srvs():
   if not path.exists("airprint-generate"):
