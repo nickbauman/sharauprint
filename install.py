@@ -176,14 +176,11 @@ def create_crontab():
   if(tab.find_command(cmd)):
     print "You have a crontab for this already. Skipping."
     return True
-  cron_job = tab.new(cmd, comment="Adding sharauprint script, checks once a minute.")
-  cron_job.month().on('*')
-  cron_job.dom().on('*')
-  cron_job.dow().on('*')
-  cron_job.hour().on('*')
-  cron_job.minute().on('*')
+  
+  cron_job = tab.new(cmd)
   tab.write()
-  print "Wrote %s to user %s" % tab.render(), usr 
+
+  print "Wrote %s to user %s" % (tab.render(), usr) 
 
 def main():
   """Main."""
