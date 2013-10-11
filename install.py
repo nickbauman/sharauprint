@@ -44,6 +44,7 @@ class InstallProgressSync(apt.progress.base.InstallProgress):
     return False # don't fork
   
 def found_in_file(fileName, pattern):
+  print "filename smb %s" % fileName
   with open(fileName) as f:
     s = mmap.mmap(f.fileno(), 0, mmap.ACCESS_READ)
     for line in s:
@@ -124,6 +125,13 @@ def aptget_deps():
     print "Packages already installed."
  
 def pip_deps():
+  
+  try:
+    import dateutil 
+  except ImportError:
+    print "You are missing dateutils. Getting it to continue install" 
+    call(["pip", "install", "dateutils"])
+    sys.exit("dateutils installed. Please rerun the script to continue.")
   try:
     from crontab import CronTab
   except ImportError:
