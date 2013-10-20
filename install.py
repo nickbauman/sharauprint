@@ -22,9 +22,27 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
+from subprocess import call
+
+try:
+  import apt_pkg
+except ImportError:
+  print "You don't have the apt_pkg module."
+  print "I will try to do it for you."
+  call(["apt-get", "install", "python-apt"])
+  print "rerun this script..."
+  exit(-99)
+
+
+try:
+  import apt
+except ImportError:
+  print "You don't have the apt module. Install this and re-execute the script"
+  exit(-99)
+
+
 import apt_pkg, apt, re, mmap, sys
 
-from subprocess import call
 from tempfile import mkstemp
 from shutil import move, copy
 from os import remove, path, mkdir, close, chdir, getcwd
